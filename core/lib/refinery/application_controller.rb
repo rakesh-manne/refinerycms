@@ -51,6 +51,10 @@ module Refinery
       authorisation_manager.current_user
     end
 
+    def refinery_user?
+      current_refinery_user && current_refinery_user.admin?
+    end
+
     protected
 
     # use a different model for the meta information.
