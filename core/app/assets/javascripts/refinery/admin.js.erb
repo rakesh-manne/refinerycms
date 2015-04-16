@@ -608,7 +608,7 @@ var page_options = {
               // Add a new tab for the new content section.
               $('#page_part_editors').append(data);
 
-              page_options.tabs.find("ul").append("<li><a href='#page_part_new_"+$('#new_page_part_index').val()+"'>"+part_title+"</a></li>");
+              page_options.tabs.find("ul#page_parts").append("<li><a href='#page_part_new_"+$('#new_page_part_index').val()+"'>"+part_title+"</a></li>");
               page_options.tabs.tabs("refresh");
 
               // this is here because of https://github.com/refinery/refinerycms/issues/2060
@@ -648,11 +648,19 @@ var page_options = {
         var tabId = page_options.tabs.find('.ui-tabs-active a').attr('id').match(/\d+/)[0] - 1;
 
         if($('#page_parts_attributes_' + tabId + '_id').length > 0) {
-          $.ajax({
-            url: page_options.del_part_url + '/' + $('#page_parts_attributes_' + tabId + '_id').val(),
-            type: 'DELETE'
+          $.when(
+            $.ajax({
+              url: page_options.del_part_url + '/' + $('#page_parts_attributes_' + tabId + '_id').val(),
+              type: 'DELETE'}))
+          .then(
+              function(data,status){
+                if (($flash_container = $('#flash_container')).length > 0) {
+                  $flash_container.html($('<div class="flash" id="flash">').text(data).append('<a href="#" class="close_icon" id="flash_close"></a>')
+                    .addClass((status=='success')? 'flash_notice' : 'flash_error'));
+                  $('#flash').css({'width': 'auto', 'visibility': null}).show();
+                }
           });
-        }
+        };
 
         page_options.tabs.find(".ui-tabs-active").remove();
         page_options.tabs.find("#page_part_" + tabName.toLowerCase()).remove();

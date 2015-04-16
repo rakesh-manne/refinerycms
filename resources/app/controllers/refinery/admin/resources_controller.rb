@@ -13,7 +13,7 @@ module Refinery
       end
 
       def create
-        @resources = Resource.create_resources(params[:resource])
+        @resources = Resource.create_resources(resource_params)
         @resource = @resources.detect { |r| !r.valid? }
 
         if params[:insert]
@@ -81,7 +81,12 @@ module Refinery
       end
 
       def resource_params
-        params.require(:resource).permit(:file)
+        # update only supports a single file, create supports many.
+        if action_name == 'update'
+          params.require(:resource).permit(:file)
+        else
+          params.require(:resource).permit(:file => [])
+        end
       end
 
     end
